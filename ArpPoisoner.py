@@ -3,6 +3,10 @@
 #	Arp poisoning with broadcast arp replys
 #	unicast support is also included
 #
+#	this is a one-way poison so you will need to poison the
+#	gateway with for each client.  I am working on an updated version
+#	which basically mimics ettercap but done in python
+#
 #	socketready.com
 #
 
